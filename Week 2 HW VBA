@@ -1,0 +1,111 @@
+Sub SotckHW()
+    'make changes in all tabs
+    For Each ws In Worksheets
+ 
+    'set what the changes will be in each of the tabs
+    ws.Cells(1, 9).Value = "Ticker Symbol"
+    ws.Cells(1, 10).Value = "Yearly Change $"
+    ws.Cells(1, 11).Value = "Percent Change"
+    ws.Cells(1, 12).Value = "Total Stock Volume"
+   
+    'set variables
+    Dim ncnt As Integer
+    Dim opening As Double
+    Dim closing As Double
+    Dim countItem As Double
+    Dim Yearly_change As Double
+   
+    'counts
+    ncnt = 2
+    opening = 0
+    closing = 0
+    countItem = 0
+   
+ 
+    'look till the end of the ticker column
+    Total_Rows = ws.Cells(Rows.Count, "A").End(xlUp).Row
+  
+    'check for the change in ticket name and make if statements for the changes in price
+    For i = 1 To Total_Rows
+        If ws.Cells(i + 1, 1).Value <> ws.Cells(i, 1).Value Then
+            ws.Cells(ncnt, 9).Value = ws.Cells(i + 1, 1).Value
+            opening = ws.Cells(i + 1, 3).Value
+            countItem = WorksheetFunction.CountIf(ws.Range("A:A"), ws.Cells(ncnt, 9).Value)
+            closing = ws.Cells(i + countItem, 6).Value
+            ws.Cells(ncnt, 10).Value = closing - opening
+            ws.Cells(ncnt, 10).NumberFormat = "$0.00"
+                If opening = 0 Then
+                ws.Cells(ncnt, 11).Value = 0
+                Else
+                ws.Cells(ncnt, 11).Value = (closing - opening) / opening
+            End If
+           
+            ncnt = ncnt + 1
+         End If
+            
+    Next i
+   
+    
+    'ticker symbol in column I
+    tot_rpt = ws.Cells(Rows.Count, "I").End(xlUp).Row
+   
+    
+    For cnt = 2 To tot_rpt
+      'Set colors for change in $
+      If ws.Cells(cnt, 10).Value >= 0 Then
+        ws.Cells(cnt, 10).Interior.ColorIndex = 4
+      Else
+        ws.Cells(cnt, 10).Interior.ColorIndex = 3
+      End If
+     
+    'set values for ranges
+    Dim TickerRange As Range
+    Dim OpenRange As Range
+    Dim VolumeRange As Range
+   
+    'set ranges
+    Set TickerRange = ws.Range("A:A")
+    Set OpenRange = ws.Range("C:C")
+    Set VolumeRange = ws.Range("G:G")
+   
+      'put volume in L(12)
+      ws.Cells(cnt, 12).Value = WorksheetFunction.SumIfs(VolumeRange, TickerRange, ws.Cells(cnt, 9).Value)
+        
+    Next cnt
+   
+    
+    ws.Columns("K").NumberFormat = "0.00%"
+   
+    'print increase, decrease, and volume
+    ws.Cells(2, 16).Value = "Greatest % Increase"
+    ws.Cells(3, 16).Value = "Greatest % Decrease"
+    ws.Cells(4, 16).Value = "Greatest Total Volume"
+   
+   'print ticket and value header
+    ws.Cells(1, 17).Value = "Ticker"
+    ws.Cells(1, 18).Value = "Value"
+  
+    
+    'print the maxes, and mins
+     ws.Cells(2, 18).Value = WorksheetFunction.Max(ws.Range("K:K"))
+     ws.Cells(3, 18).Value = WorksheetFunction.Min(ws.Range("K:K"))
+     ws.Cells(4, 18).Value = WorksheetFunction.Max(ws.Range("L:L"))
+    
+     For cnt3 = 1 To tot_rpt
+        If ws.Cells(cnt3, 11).Value = ws.Cells(2, 18).Value Then
+            ws.Cells(2, 17).Value = ws.Cells(cnt3, 9).Value
+        ElseIf ws.Cells(cnt3, 11).Value = ws.Cells(3, 18).Value Then
+            ws.Cells(3, 17).Value = ws.Cells(cnt3, 9).Value
+        ElseIf ws.Cells(cnt3, 12).Value = ws.Cells(4, 18).Value Then
+            ws.Cells(4, 17).Value = ws.Cells(cnt3, 9).Value
+        End If
+     Next cnt3
+    
+    'format cells
+     ws.Cells(2, 18).NumberFormat = "0.00%"
+     ws.Cells(3, 18).NumberFormat = "0.00%"
+     ws.Cells(4, 18).NumberFormat = "0.00"
+        
+    
+Next ws
+End Sub
