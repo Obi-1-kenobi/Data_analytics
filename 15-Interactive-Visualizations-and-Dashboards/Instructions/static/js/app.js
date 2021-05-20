@@ -1,8 +1,8 @@
 function init() {
-    // Select the dropdown element
+    // dropdown element
     var selector = d3.select("#selDataset");
     
-    // Populate the dropdown with subject ID's from the list of sample Names
+    // Populate the dropdown 
       d3.json("data/samples.json").then((data) => {
         var subjectIds = data.names;
         subjectIds.forEach((id) => {
@@ -12,7 +12,7 @@ function init() {
           .property("value", id);
         });
       
-      // Use the first subject ID from the names to build initial plots
+      // build initial plots
       const firstSubject = subjectIds[0];
       updateCharts(firstSubject);
       updateMetadata(firstSubject);
@@ -59,9 +59,7 @@ function init() {
   
     
     Plotly.newPlot("gauge", data, layout);
-  // Use `Object.entries` to add each key and value pair to the metaPanel
-  // Hint: Inside the loop, you will need to use d3 to append new
-  // tags for each key-value in the metadata.
+
     });
   }
   
@@ -115,11 +113,11 @@ function init() {
   
   
   function optionChanged(newSample) {
-    // Fetch new data each time a new sample is selected
+    // get new data for new sample 
     updateCharts(newSample);
     updateMetadata(newSample);
   }
   
-  // Initialize the dashboard
+  // Initialize
   init();
   
